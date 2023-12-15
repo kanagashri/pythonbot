@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  flaskapp:
+    build: ./PyBot
+    ports:
+      - "5000:5000"
+    environment:
+      - SERVER_NAME=0.0.0.0
+    network_mode: host

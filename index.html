@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Chatbot</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div id="chatbox">
+    <p class="botText"><span>Welcome! I'm your IT Support Bot, ready to assist you. To kick off our chat, simply send a friendly 'Hi'. How can I help you today?</span>
+    </p>
+</div>
+<div id="userInput">
+    <input id="textInput" name="msg" placeholder="Message" type="text">
+    <input id="buttonInput" type="submit" value="Send">
+    <button onclick="startNewChat()">Start New Chat</button>
+</div>
+<script>
+    function startNewChat() {
+        // Clear the chat history
+        document.getElementById('chatbox').innerHTML = '';
+        // Display the welcome message
+        var botHtml = '<p class="botText"><span>Welcome! I\'m your IT Support Bot, ready to assist you. To start a chat, simply send a friendly \'Hi\'. How can I help you today?</span></p>';
+        $("#chatbox").append(botHtml);
+        // Send a message to the server to reset the chat
+        $.get("/reset", function () {
+            // Handle the response here if needed
+        });
+    }
+
+
+    function getBotResponse() {
+        var rawText = $("#textInput").val();
+        if (rawText.trim() === '') {
+            // User input is empty, don't send a request
+            return;
+        }
+        var userHtml = '<p class="userText"><span>' + rawText + '</span></p>';
+        $("#textInput").val("");
+        $("#chatbox").append(userHtml);
+        document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+        $.get("/get", {msg: rawText}).done(function (data) {
+            var botHtml = '<p class="botText"><span>' + data.response + '</span></p>';
+            $("#chatbox").append(botHtml);
+            document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+        });
+    }
+
+    $("#textInput").keypress(function (e) {
+        if (e.which == 13) {
+            getBotResponse();
+        }
+    });
+
+    $("#buttonInput").click(function () {
+        getBotResponse();
+    });
+</script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: grey;
+    }
+
+    #chatbox {
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        background-color: #fff;
+        height: 500px;
+        overflow: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    #userInput {
+        margin-left: 10px;
+        margin-right: 10px;
+        padding-top: 10px;
+    }
+
+    #textInput {
+        width: 80%;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 5px;
+    }
+
+    #buttonInput {
+        width: 18%;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 5px;
+    }
+
+    .userText {
+        color: blue;
+        font-weight: bold;
+    }
+
+    .botText {
+        color: red;
+    }
+</style>
+</body>
+</html>
